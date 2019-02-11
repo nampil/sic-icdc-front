@@ -369,18 +369,20 @@
 
               <v-flex
                 xs12
-                text-xs-right
+                text-xs-center
               >
                 <v-btn
-                  class="mx-4 font-weight-light"
+                  class="ma-2 font-weight-light"
                   color="error"
                   @click="resetForm"
+                  small
                 >Cancelar</v-btn>
 
                 <v-btn
                   :color="enviarBtn.color"
-                  class="mx-0 font-weight-light"
+                  class="ma-2 font-weight-light"
                   @click="updateEvent"
+                  small
                 >{{ enviarBtn.text }}</v-btn>
               </v-flex>
             </v-layout>
@@ -396,7 +398,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'Event',
 
-  data () {
+  data() {
     return {
       event: this.$store.getters.getEventById(this.$route.params.id),
       menuEndTime: null,
@@ -418,19 +420,19 @@ export default {
     }
   },
   computed: {
-    areaScope () {
+    areaScope() {
       return this.$store.getters.getAreaScope.map(area => {
         return area.title
       })
     },
-    maxTimeC () {
+    maxTimeC() {
       if (this.minTimeC) {
         return '24:30'
       } else {
         return undefined
       }
     },
-    minTimeC () {
+    minTimeC() {
       if (this.event.eventDateC && this.event.eventDate) {
         const [yearC, monthC, dayC] = this.event.eventDateC.split('-')
         const [year, month, day] = this.event.eventDate.split('-')
@@ -442,12 +444,12 @@ export default {
         return undefined
       }
     },
-    minDateC () {
+    minDateC() {
       return this.event.eventDate
         ? this.event.eventDate
         : new Date().toISOString().substr(0, 10)
     },
-    enviarBtn () {
+    enviarBtn() {
       if (this.showErrorDate || this.showErrorTime) {
         return {
           text: 'Datos invalidos',
@@ -461,14 +463,14 @@ export default {
       }
     },
     endTimeFormatted: {
-      get: function () {
+      get: function() {
         return this.formatEndTime(this.event.endTime)
       },
-      set: function (val) {
+      set: function(val) {
         this.event.endTime = val
       }
     },
-    eventState: function () {
+    eventState: function() {
       if (this.$store.state.events.length > 0) {
         const stateEvent = this.$store.state.events.filter(event => {
           if (event._id === this.$route.params.id) {
@@ -510,7 +512,7 @@ export default {
         }
       }
     },
-    eventDateToDB () {
+    eventDateToDB() {
       const [year, month, day] = this.event.eventDate.split('-')
       const [hour, min] = this.event.eventTime.split(':')
       const formattedDate = new Date(
@@ -523,7 +525,7 @@ export default {
 
       return formattedDate
     },
-    endDateToDB () {
+    endDateToDB() {
       const [year, month, day] = this.event.endDate.split('-')
       const [hour, min] = this.event.eventTimeC.split(':')
       const formattedDate = new Date(
@@ -536,7 +538,7 @@ export default {
 
       return formattedDate
     },
-    maxDate () {
+    maxDate() {
       const nowDate = new Date()
       const nowYear = nowDate.getFullYear()
       const nowMonth = nowDate.getMonth()
@@ -545,35 +547,35 @@ export default {
       return new Date(nowYear + 1, nowMonth, nowDay).toISOString().substr(0, 10)
     },
     isloading: {
-      get: function () {
+      get: function() {
         return this.$store.getters.getIsloading
       },
-      set: function (payload) {
+      set: function(payload) {
         this.$store.dispatch('setLoading', payload)
       }
     }
   },
   watch: {
-    eventState () {
+    eventState() {
       if (this.eventState) this.event = this.eventState
     }
   },
-  created () {},
+  created() {},
 
   methods: {
-    resetTime () {
+    resetTime() {
       this.event.eventTime = ''
     },
-    setLocalStoreEventData (eventData) {
+    setLocalStoreEventData(eventData) {
       localStorage.setItem('newEventFormData', JSON.stringify(eventData))
     },
-    isEmpty (obj) {
+    isEmpty(obj) {
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) return false
       }
       return true
     },
-    formatEndTime (endTime) {
+    formatEndTime(endTime) {
       if (!endTime) return null
       const hour = endTime.split(':')[0]
       const min = endTime.split(':')[1]
@@ -584,32 +586,32 @@ export default {
         return hour + ':' + min + ' am'
       }
     },
-    formatDate (date) {
+    formatDate(date) {
       const [year, moth, day] = new Date(date)
         .toISOString()
         .substr(0, 10)
         .split('-')
     },
-    resetDate () {
+    resetDate() {
       this.event.eventDate = ''
       this.resetDateC()
       this.resetTimeC()
     },
-    resetDateC () {
+    resetDateC() {
       if (this.event.eventDateC) this.event.eventDateC = ''
     },
-    resetTimeC () {
+    resetTimeC() {
       if (this.event.eventTimeC) this.event.eventTimeC = ''
     },
-    resetTime () {
+    resetTime() {
       this.resetTimeC()
       this.event.eventTime = ''
     },
-    resetForm () {
+    resetForm() {
       this.event = this.$store.getters.getEventById(this.$route.params.id)
     },
 
-    updateEvent () {
+    updateEvent() {
       this.isloading = true
 
       const query = {

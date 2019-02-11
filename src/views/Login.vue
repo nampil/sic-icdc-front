@@ -1,57 +1,59 @@
 <template>
   <div class="login">
-    <v-layout>
-      <v-flex
-        xs12
-        sm6
-        offset-sm3
-      >
-        <material-card
-          color="green"
-          title="Ingresar"
-          class="text-xs-center"
+    <v-container>
+      <v-layout>
+        <v-flex
+          xs12
+          sm6
+          offset-sm3
         >
-          <v-form
-            ref="form"
-            @submit.prevent="submit"
+          <material-card
+            color="green"
+            title="Ingresar"
+            class="text-xs-center"
           >
-            <v-alert
-              :value="hasErr"
-              type="error"
-              transition="scale-transition"
-            >{{ errMsg }}</v-alert>
+            <v-form
+              ref="form"
+              @submit.prevent="submit"
+            >
+              <v-alert
+                :value="hasErr"
+                type="error"
+                transition="scale-transition"
+              >{{ errMsg }}</v-alert>
 
-            <v-text-field
-              v-model="usuario"
-              :rules="[rules.required]"
-              prepend-icon="mdi-account"
-              required
-              label="Email"
-            />
-            <v-text-field
-              :append-icon="show1 ? 'mdi-eye-off' : 'mdi-eye'"
-              v-model="password"
-              :type="show1 ? 'text' : 'password'"
-              :rules="[rules.required]"
-              prepend-icon="mdi-key"
-              required
-              label="Clave"
-              @click:append="show1 = !show1"
-            />
-            <v-btn
-              color="primary"
-              class="ma-2"
-              type="submit"
-            >Enviar</v-btn>
-            <v-btn
-              color="tertiary"
-              class="ma-2"
-              @click="clearForm"
-            >Cancelar</v-btn>
-          </v-form>
-        </material-card>
-      </v-flex>
-    </v-layout>
+              <v-text-field
+                v-model="usuario"
+                :rules="[rules.required]"
+                prepend-icon="mdi-account"
+                required
+                label="Email"
+              />
+              <v-text-field
+                :append-icon="show1 ? 'mdi-eye-off' : 'mdi-eye'"
+                v-model="password"
+                :type="show1 ? 'text' : 'password'"
+                :rules="[rules.required]"
+                prepend-icon="mdi-key"
+                required
+                label="Clave"
+                @click:append="show1 = !show1"
+              />
+              <v-btn
+                color="primary"
+                class="ma-2"
+                type="submit"
+              >Enviar</v-btn>
+              <v-btn
+                color="tertiary"
+                class="ma-2"
+                @click="clearForm"
+              >Cancelar</v-btn>
+            </v-form>
+          </material-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 <script>
@@ -60,7 +62,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
       usuario: '',
       password: '',
@@ -73,13 +75,13 @@ export default {
     }
   },
   computed: {
-    credentials () {
+    credentials() {
       const authQuery = {
         query: `
                 query {
                     login(email: "${this.usuario}", password: "${
-  this.password
-}")
+          this.password
+        }")
                     {
                         userId
                         token
@@ -94,14 +96,14 @@ export default {
     }
   },
   methods: {
-    clearForm () {
+    clearForm() {
       this.usuario = ''
       this.password = ''
       this.hasErr = false
       this.errMsg = ''
       this.$refs.form.reset()
     },
-    submit () {
+    submit() {
       if (
         !this.usuario ||
         !this.password ||

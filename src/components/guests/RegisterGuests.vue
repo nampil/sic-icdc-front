@@ -168,17 +168,23 @@
       slot="actions"
       class="fullwidth"
     >
-      <v-spacer/>
+      <v-spacer></v-spacer>
       <v-btn
-        class="ml-auto"
+        small
+        icon
         color="tertiary"
         @click="closeModal"
-      >Cancelar</v-btn>
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       <v-btn
-        class="ml-4"
+        small
+        icon
         color="success"
         @click="registerGuest"
-      >Registrar</v-btn>
+      >
+        <v-icon>mdi-check</v-icon>
+      </v-btn>
     </v-card-actions>
   </material-card>
 </template>
@@ -188,7 +194,7 @@ export default {
   props: {
     eventId: String
   },
-  data () {
+  data() {
     return {
       menu1: false,
       guest: {},
@@ -199,41 +205,41 @@ export default {
     }
   },
   computed: {
-    isloading () {
+    isloading() {
       return this.$store.getters.getIsloading
     },
     computedDateFormatted: {
-      get: function () {
+      get: function() {
         return this.formatDate(this.guest.bdate)
       },
-      set: function (val) {
+      set: function(val) {
         return (this.guest.bdate = val)
       }
     }
   },
   watch: {
-    menu1 (val) {
+    menu1(val) {
       val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
     }
   },
-  created () {},
+  created() {},
   methods: {
-    closeModal () {
+    closeModal() {
       this.$emit('close-modal')
       this.$refs.guestForm.reset()
     },
-    resetBdate () {
+    resetBdate() {
       this.menu1 = false
       this.guest.bdate = undefined
     },
-    formatDate (date) {
+    formatDate(date) {
       if (!date) return null
 
       const [year, month, day] = date.split('-')
       return `${day}/${month}/${year}`
     },
 
-    registerGuest (val) {
+    registerGuest(val) {
       this.$store.commit('loading', true)
       const index = this.$store.state.events
         .map(event => event._id)

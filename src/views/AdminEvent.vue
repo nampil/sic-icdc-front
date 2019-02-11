@@ -45,16 +45,18 @@
           <div slot="header">
             <v-layout
               justify-space-between
+              align-center
               row
               wrap
+              class="pa-2"
             >
-              <v-flex xs10>
+              <div>
                 <div class="title font-weight-light mb-2">Asistencia</div>
                 <div
                   v-if="showCountdown"
                   class="category"
                 >
-                  Evento comienza en:
+                  Inicia en:
                   <span v-if="showCountdown && daysTgo * 1 > 0">{{ daysTgo }}:</span>
                   <span v-if="showCountdown && hoursTgo * 1 > 0">{{ hoursTgo }}:</span>
                   <span v-if="showCountdown && ((hoursTgo * 1) + (minsTgo * 1)) > 0">{{ minsTgo }}:</span>
@@ -62,27 +64,24 @@
                     v-if="showCountdown && (( hoursTgo * 1) + (minsTgo * 1) + (secsTgo * 1)) > 0"
                   >{{ secsTgo }}</span>
                 </div>
-              </v-flex>
-              <v-flex
-                xs2
-                class="text-xs-right"
+              </div>
+
+              <v-btn
+                :color="activeColor"
+                dark
+                small
+                icon
+                @click="event.active = !event.active"
               >
-                <v-btn
-                  :color="activeColor"
-                  fab
-                  dark
-                  @click="event.active = !event.active"
-                >
-                  <v-icon
-                    v-if="event.active"
-                    color="white"
-                  >mdi-lock-open-outline</v-icon>
-                  <v-icon
-                    v-else
-                    color="white"
-                  >mdi-lock-clock</v-icon>
-                </v-btn>
-              </v-flex>
+                <v-icon
+                  v-if="event.active"
+                  color="white"
+                >mdi-lock-open-outline</v-icon>
+                <v-icon
+                  v-else
+                  color="white"
+                >mdi-lock-clock</v-icon>
+              </v-btn>
             </v-layout>
           </div>
           <v-card-text>
@@ -117,15 +116,15 @@
                 </v-flex>
               </v-layout>
             </v-form>
+            <v-card-actions slot="actions">
+              <v-spacer></v-spacer>
+              <v-btn
+                :small="responsive"
+                color="success"
+                @click="saveAdminEvent"
+              >Guardar</v-btn>
+            </v-card-actions>
           </v-card-text>
-
-          <v-card-actions slot="actions">
-            <v-spacer/>
-            <v-btn
-              color="success"
-              @click="saveAdminEvent"
-            >Guardar</v-btn>
-          </v-card-actions>
         </material-card>
       </v-flex>
 
@@ -138,7 +137,7 @@
 import { mapGetters } from 'vuex'
 export default {
   name: 'AdminEvent',
-  data () {
+  data() {
     return {
       event: this.$store.getters.getEventById(this.$route.params.id),
       daysTgo: null,
@@ -148,12 +147,13 @@ export default {
       showCountdown: false,
       watch: false,
       activeColor: 'warning',
-      registerGuestModal: false
+      registerGuestModal: false,
+      responsive: false
     }
   },
   computed: {
     computedEventGuests: {
-      get: function () {
+      get: function() {
         const arrayGuestsObjs = this.event.guests.map(id => {
           const guestById = this.$store.getters.getAllGuests.filter(
             guest => guest._id === id
@@ -178,7 +178,7 @@ export default {
           return []
         }
       },
-      set: function (payload) {
+      set: function(payload) {
         const index = this.$store.state.events
           .map(event => {
             return event._id
@@ -201,17 +201,17 @@ export default {
         this.$store.commit('setGuestsOnEvent', topayload)
       }
     },
-    guests () {
+    guests() {
       return this.$store.getters.getAllGuests.map(guest => guest.name)
     },
-    members () {
+    members() {
       return this.$store.getters.getAllMembers.map(member => member.name)
     },
-    chekcActive () {
+    chekcActive() {
       if (this.event) return this.event.active
     },
 
-    eventState () {
+    eventState() {
       const eventSt = this.$store.getters.getEventById(this.$route.params.id)
 
       if (eventSt) {
@@ -224,10 +224,10 @@ export default {
     }
   },
   watch: {
-    eventState (val) {
+    eventState(val) {
       this.event = val
     },
-    chekcActive (val) {
+    chekcActive(val) {
       if (val === true) {
         this.activeColor = 'success'
       } else {
@@ -235,18 +235,25 @@ export default {
       }
     }
   },
-  created () {},
-  mounted () {
+  created() {},
+  mounted() {
     this.setActive()
   },
-  beforeDestroy () {
+  beforeDestroy() {
     clearInterval(this.x)
   },
   methods: {
-    closeModal () {
+    onResponsiveInverted() {
+      if (window.innerWidth < 991) {
+        this.responsive = true
+      } else {
+        this.responsive = false
+      }
+    },
+    closeModal() {
       this.registerGuestModal = false
     },
-    setActive () {
+    setActive() {
       if (this.eventState) {
         const [ye, mo, da] = this.eventState.eventDate.split('-')
         const [ho, mi] = this.eventState.eventTime.split(':')
@@ -263,16 +270,16 @@ export default {
         }
       }
     },
-    setState (localState) {
+    setState(localState) {
       return (this.event = localState)
     },
-    countDown (date, time) {
+    countDown(date, time) {
       const vm = this
       const [ye, mo, da] = date.split('-')
       const [ho, mi] = time.split(':')
 
-      return (this.x = setInterval(function () {
-        function pad (n) {
+      return (this.x = setInterval(function() {
+        function pad(n) {
           return n < 10 ? '0' + n : n
         }
         const eventDate = new Date(ye, mo - 1, da, ho, mi, 0, 0)
@@ -298,7 +305,14 @@ export default {
       }, 1000))
     },
 
-    saveAdminEvent () {}
+    saveAdminEvent() {}
+  },
+  mounted() {
+    this.onResponsiveInverted()
+    window.addEventListener('resize', this.onResponsiveInverted)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResponsiveInverted)
   }
 }
 </script>

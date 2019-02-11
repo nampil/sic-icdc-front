@@ -25,12 +25,20 @@
             v-if="!edit"
             color="info"
             @click="edit = !edit"
-          >Editar</v-btn>
+            icon
+            small
+          >
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
           <v-btn
             v-else
             color="tertiary"
             @click="(edit = !edit), resetForm()"
-          >Cancelar</v-btn>
+            small
+            icon
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </v-layout>
         <v-form>
           <v-container
@@ -218,21 +226,29 @@
               </v-flex>
               <v-flex
                 xs12
-                text-xs-right
+                text-xs-center
               >
                 <v-expand-transition>
                   <div v-show="edit">
                     <v-btn
-                      class="mx-4 font-weight-light"
+                      class="ma-2 font-weight-light"
                       color="tertiary"
                       @click="resetForm"
-                    >Cancelar</v-btn>
+                      small
+                      icon
+                    >
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
 
                     <v-btn
-                      class="mx-0 font-weight-light"
+                      class="ma-2 font-weight-light"
                       color="success"
                       @click="updateMember"
-                    >Actualizar</v-btn>
+                      small
+                      icon
+                    >
+                      <v-icon>mdi-check</v-icon>
+                    </v-btn>
                   </div>
                 </v-expand-transition>
               </v-flex>
@@ -249,7 +265,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'Member',
 
-  data () {
+  data() {
     return {
       edit: false,
       rulesName: [v => !!v || 'Se requiere nombre'],
@@ -277,17 +293,17 @@ export default {
     }
   },
   computed: {
-    stateMember: function () {
+    stateMember: function() {
       return this.$store.getters.getMemberById(this.$route.params.id)
     },
-    tel: function () {
+    tel: function() {
       if (this.member && this.member.tel !== 'undefined') {
         return this.member.tel
       } else {
         return ''
       }
     },
-    email () {
+    email() {
       if (this.member) {
         return this.member.email
       } else {
@@ -295,30 +311,30 @@ export default {
       }
     },
     isloading: {
-      get: function () {
+      get: function() {
         return this.$store.getters.getIsloading
       },
-      set: function (payload) {
+      set: function(payload) {
         this.$store.dispatch('setLoading', payload)
       }
     },
-    computedDateFormatted () {
+    computedDateFormatted() {
       return this.formatDate(this.member.bdate)
     },
-    memAge () {
+    memAge() {
       const memberAge =
         Math.abs(Date.now() - new Date(this.member.bdate)) / 31557600000
       return Math.floor(memberAge)
     }
   },
   watch: {
-    stateMember: function () {
+    stateMember: function() {
       this.member = this.stateMember
     },
-    menu1 (val) {
+    menu1(val) {
       val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
     },
-    tel: function (val) {
+    tel: function(val) {
       if (val && val !== '') {
         this.telRules = [
           v =>
@@ -328,7 +344,7 @@ export default {
         this.telRules = []
       }
     },
-    email (val) {
+    email(val) {
       if (val && val !== '') {
         this.emailRules = [
           v =>
@@ -341,30 +357,30 @@ export default {
       }
     }
   },
-  created () {},
+  created() {},
   methods: {
-    resetForm () {
+    resetForm() {
       this.member = this.$store.getters.getMemberById(this.$route.params.id)
     },
-    resetBdate () {
+    resetBdate() {
       this.menu1 = false
       this.member.bdate = this.$store.getters.getMemberById(
         this.$route.params.id
       ).bdate
     },
-    formatDate (date) {
+    formatDate(date) {
       if (!date) return null
 
       const [year, month, day] = date.split('-')
       return `${day}/${month}/${year}`
     },
-    parseDate (date) {
+    parseDate(date) {
       if (!date) return null
 
       const [month, day, year] = date.split('/')
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     },
-    updateMember () {
+    updateMember() {
       this.isloading = true
       console.log(JSON.stringify(this.member.relatives))
       const query = {

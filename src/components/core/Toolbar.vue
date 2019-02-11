@@ -21,7 +21,7 @@
     </div>
 
     <v-spacer/>
-    <v-toolbar-items>
+    <v-toolbar-items v-if="!responsive">
       <v-flex
         align-center
         layout
@@ -96,34 +96,34 @@ export default {
     responsiveInput: false
   }),
   computed: {
-    isAuthPresent () {
+    isAuthPresent() {
       return this.$store.getters.isAuth
     }
   },
 
   watch: {
-    $route (val) {
+    $route(val) {
       this.title = val.name
     }
   },
 
-  mounted () {
+  mounted() {
     this.onResponsiveInverted()
     window.addEventListener('resize', this.onResponsiveInverted)
   },
-  beforeDestroy () {
+  beforeDestroy() {
     window.removeEventListener('resize', this.onResponsiveInverted)
   },
 
   methods: {
     ...mapMutations('app', ['setDrawer', 'toggleDrawer']),
-    onClickBtn () {
+    onClickBtn() {
       this.setDrawer(!this.$store.state.app.drawer)
     },
-    onClick () {
+    onClick() {
       //
     },
-    onResponsiveInverted () {
+    onResponsiveInverted() {
       if (window.innerWidth < 991) {
         this.responsive = true
         this.responsiveInput = false
@@ -132,7 +132,7 @@ export default {
         this.responsiveInput = true
       }
     },
-    logout () {
+    logout() {
       this.$store.dispatch('logout')
       this.$router.push('/login')
     }

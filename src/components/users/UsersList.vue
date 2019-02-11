@@ -97,7 +97,7 @@
 import { mapGetters } from 'vuex'
 export default {
   name: 'UsersList',
-  data () {
+  data() {
     return {
       search: null,
       showAlertDeleteUser: false,
@@ -110,7 +110,7 @@ export default {
       users: 'getAllUsers',
       isLoading: 'getIsloading'
     }),
-    usersFormat () {
+    usersFormat() {
       const uf = this.users.map(user => {
         return {
           ...user,
@@ -121,25 +121,25 @@ export default {
     }
   },
   methods: {
-    userRole (user) {
+    userRole(user) {
       const role = this.$store.state.roles.filter(
         role => role.role === user.role
       )[0]
       console.log(role)
       return role.title
     },
-    goToProfile (id) {
+    goToProfile(id) {
       this.$router.push('/users/user/' + id)
     },
-    alertDeleteUser (id) {
+    alertDeleteUser(id) {
       this.deleteUserId = id
       this.showAlertDeleteUser = true
     },
-    resetDeleteUser () {
+    resetDeleteUser() {
       this.deleteUserId = null
       this.showAlertDeleteUser = false
     },
-    deleteUser () {
+    deleteUser() {
       this.$store.dispatch('setLoading', true)
       this.$store
         .dispatch('deleteUser', this.deleteUserId)

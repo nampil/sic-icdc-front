@@ -1,220 +1,224 @@
 <template>
-  <v-layout>
-    <v-flex
-      xs12
-      sm10
-      offset-sm1
-    >
-      <material-card
-        color="primary"
-        title="Nuevo Miembro"
-        text="Registre los datos para el nuevo miembro"
+  <v-container>
+    <v-layout>
+      <v-flex
+        xs12
+        sm10
+        offset-sm1
       >
-        <v-form ref="newMemberForm">
-          <v-container
-            py-0
-            class="relative"
-          >
-            <div
-              v-if="isloading"
-              class="loading"
+        <material-card
+          color="primary"
+          title="Nuevo Miembro"
+          text="Registre los datos para el nuevo miembro"
+        >
+          <v-form ref="newMemberForm">
+            <v-container
+              py-0
+              class="relative pa-0 ma-0"
             >
-              <v-layout
-                align-center
-                justify-center
-                row
-                fill-height
+              <div
+                v-if="isloading"
+                class="loading"
               >
-                <v-flex
-                  xs12
-                  class="text-xs-center"
+                <v-layout
+                  align-center
+                  justify-center
+                  row
+                  fill-height
                 >
-                  <v-progress-circular
-                    :size="70"
-                    :width="7"
-                    class="progress"
-                    color="purple"
-                    indeterminate
+                  <v-flex
+                    xs12
+                    class="text-xs-center"
+                  >
+                    <v-progress-circular
+                      :size="70"
+                      :width="7"
+                      class="progress"
+                      color="purple"
+                      indeterminate
+                    />
+                  </v-flex>
+                </v-layout>
+              </div>
+
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="member.name"
+                    :rules="nameRules"
+                    class="purple-input"
+                    label="Nombre"
+                    prepend-inner-icon="mdi-account-outline"
                   />
                 </v-flex>
-              </v-layout>
-            </div>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-menu
+                    ref="menu1"
+                    :close-on-content-click="false"
+                    :return-value.sync="member.bdate"
+                    v-model="menu1"
+                    :nudge-right="40"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      slot="activator"
+                      v-model="computedDateFormatted"
+                      :rules="bdateRules"
+                      label="Fecha de Nacimiento"
+                      readonly
+                      prepend-icon="mdi-calendar-star"
+                    />
 
-            <v-layout wrap>
-              <v-flex xs12>
-                <v-text-field
-                  v-model="member.name"
-                  :rules="nameRules"
-                  class="purple-input"
-                  label="Nombre"
-                  prepend-inner-icon="mdi-account-outline"
-                />
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-menu
-                  ref="menu1"
-                  :close-on-content-click="false"
-                  :return-value.sync="member.bdate"
-                  v-model="menu1"
-                  :nudge-right="40"
-                  lazy
-                  transition="scale-transition"
-                  offset-y
-                  full-width
-                  max-width="290px"
-                  min-width="290px"
+                    <v-date-picker
+                      ref="picker"
+                      :max="new Date().toISOString().substr(0, 10)"
+                      v-model="member.bdate"
+                      class="datePicker"
+                      locale="ES-ve"
+                      min="1950-01-01"
+                    >
+                      <v-spacer/>
+                      <v-btn
+                        flat
+                        color="primary"
+                        @click="resetBdate"
+                      >Cancelar</v-btn>
+                      <v-btn
+                        flat
+                        color="primary"
+                        @click="$refs.menu1.save(member.bdate)"
+                      >OK</v-btn>
+                    </v-date-picker>
+                  </v-menu>
+                </v-flex>
+
+                <v-flex
+                  xs12
+                  md3
                 >
                   <v-text-field
-                    slot="activator"
-                    v-model="computedDateFormatted"
-                    :rules="bdateRules"
-                    label="Fecha de Nacimiento"
+                    :value="memAge"
+                    label="Edad"
+                    class="purple-input"
                     readonly
-                    prepend-icon="mdi-calendar-star"
+                    prepend-inner-icon="mdi-counter"
                   />
+                </v-flex>
+                <v-flex
+                  xs12
+                  md3
+                >
+                  <v-select
+                    v-model="member.gender"
+                    :items="gender"
+                    :rules="genderRules"
+                    class="purple-input"
+                    label="Genero"
+                    prepend-inner-icon="mdi-gender-male-female"
+                  />
+                </v-flex>
 
-                  <v-date-picker
-                    ref="picker"
-                    :max="new Date().toISOString().substr(0, 10)"
-                    v-model="member.bdate"
-                    class="datePicker"
-                    locale="ES-ve"
-                    min="1950-01-01"
-                  >
-                    <v-spacer/>
-                    <v-btn
-                      flat
-                      color="primary"
-                      @click="resetBdate"
-                    >Cancelar</v-btn>
-                    <v-btn
-                      flat
-                      color="primary"
-                      @click="$refs.menu1.save(member.bdate)"
-                    >OK</v-btn>
-                  </v-date-picker>
-                </v-menu>
-              </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-text-field
+                    v-model="member.tel"
+                    :rules="telRules"
+                    label="Teléfono"
+                    class="purple-input"
+                    mask="(####) ###-####"
+                    validate-on-blur
+                    prepend-inner-icon="mdi-cellphone-iphone"
+                  />
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-text-field
+                    v-model="member.email"
+                    :rules="emailRules"
+                    label="Email"
+                    class="purple-input"
+                    type="email"
+                    validate-on-blur
+                    prepend-inner-icon="mdi-email"
+                  />
+                </v-flex>
 
-              <v-flex
-                xs12
-                md3
-              >
-                <v-text-field
-                  :value="memAge"
-                  label="Edad"
-                  class="purple-input"
-                  readonly
-                  prepend-inner-icon="mdi-counter"
-                />
-              </v-flex>
-              <v-flex
-                xs12
-                md3
-              >
-                <v-select
-                  v-model="member.gender"
-                  :items="gender"
-                  :rules="genderRules"
-                  class="purple-input"
-                  label="Genero"
-                  prepend-inner-icon="mdi-gender-male-female"
-                />
-              </v-flex>
+                <v-flex
+                  xs12
+                  md12
+                >
+                  <v-text-field
+                    v-model="member.address"
+                    label="Dirección"
+                    class="purple-input"
+                    prepend-inner-icon="mdi-home-map-marker"
+                  />
+                </v-flex>
 
-              <v-flex
-                xs12
-                md6
-              >
-                <v-text-field
-                  v-model="member.tel"
-                  :rules="telRules"
-                  label="Teléfono"
-                  class="purple-input"
-                  mask="(####) ###-####"
-                  validate-on-blur
-                  prepend-inner-icon="mdi-cellphone-iphone"
-                />
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-text-field
-                  v-model="member.email"
-                  :rules="emailRules"
-                  label="Email"
-                  class="purple-input"
-                  type="email"
-                  validate-on-blur
-                  prepend-inner-icon="mdi-email"
-                />
-              </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-combobox
+                    v-model="member.relatives"
+                    :items="member.relatives"
+                    label="Familiares y amigos en la ICDC"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-human-handsdown"
+                  />
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-combobox
+                    v-model="member.serveIn"
+                    :items="areasServicio"
+                    label="Áreas de Servicio"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-room-service"
+                  />
+                </v-flex>
 
-              <v-flex
-                xs12
-                md12
-              >
-                <v-text-field
-                  v-model="member.address"
-                  label="Dirección"
-                  class="purple-input"
-                  prepend-inner-icon="mdi-home-map-marker"
-                />
-              </v-flex>
+                <v-flex
+                  xs12
+                  text-xs-right
+                >
+                  <v-btn
+                    small
+                    class="mx-4 font-weight-light"
+                    color="tertiary"
+                    @click="resetForm"
+                  >Borrar</v-btn>
 
-              <v-flex
-                xs12
-                md6
-              >
-                <v-combobox
-                  v-model="member.relatives"
-                  :items="member.relatives"
-                  label="Familiares y amigos en la ICDC"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-human-handsdown"
-                />
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-combobox
-                  v-model="member.serveIn"
-                  :items="areasServicio"
-                  label="Áreas de Servicio"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-room-service"
-                />
-              </v-flex>
-
-              <v-flex
-                xs12
-                text-xs-right
-              >
-                <v-btn
-                  class="mx-4 font-weight-light"
-                  color="tertiary"
-                  @click="resetForm"
-                >Borrar</v-btn>
-
-                <v-btn
-                  class="mx-0 font-weight-light"
-                  color="success"
-                  @click="createMember"
-                >Enviar</v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
-      </material-card>
-    </v-flex>
-  </v-layout>
+                  <v-btn
+                    small
+                    class="mx-0 font-weight-light"
+                    color="success"
+                    @click="createMember"
+                  >Enviar</v-btn>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-form>
+        </material-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 <script>
 import axios from 'axios'
@@ -222,7 +226,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'NewMember',
 
-  data () {
+  data() {
     return {
       bdateRules: [v => !!v || 'Se requiere nombre'],
       nameRules: [v => !!v || 'Se requiere nombre'],
@@ -251,31 +255,31 @@ export default {
     }
   },
   computed: {
-    tel () {
+    tel() {
       if (this.member.tel && this.member.tel !== '') {
         return this.member.tel
       }
     },
-    email () {
+    email() {
       if (this.member.mail && this.member.email !== '') return this.member.email
     },
     isloading: {
-      get: function () {
+      get: function() {
         return this.$store.getters.getIsloading
       },
-      set: function (payload) {
+      set: function(payload) {
         this.$store.dispatch('setLoading', payload)
       }
     },
     computedDateFormatted: {
-      get: function () {
+      get: function() {
         return this.formatDate(this.member.bdate)
       },
-      set: function (val) {
+      set: function(val) {
         return (this.member.bdate = val)
       }
     },
-    memAge () {
+    memAge() {
       if (this.member.bdate) {
         const memberAge =
           Math.abs(Date.now() - new Date(this.member.bdate)) / 31557600000
@@ -285,17 +289,17 @@ export default {
   },
   watch: {
     member: {
-      handler: function (newval, oldval) {
+      handler: function(newval, oldval) {
         if (!this.isEmpty(newval)) {
           return this.setLocalStoreMemberData(this.member)
         }
       },
       deep: true
     },
-    menu1 (val) {
+    menu1(val) {
       val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
     },
-    tel (val) {
+    tel(val) {
       if (val && val !== '') {
         this.telRules = [
           v =>
@@ -305,7 +309,7 @@ export default {
         this.telRules = []
       }
     },
-    email (val) {
+    email(val) {
       if (val && val !== '') {
         this.emailRules = [v => /.+@.+/.test(v) || 'E-mail debe ser valido']
       } else {
@@ -313,30 +317,30 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     const newMemberFormData = localStorage.getItem('newMemberFormData')
     if (newMemberFormData) {
       this.member = JSON.parse(newMemberFormData)
     }
   },
-  created () {},
+  created() {},
 
   methods: {
-    isEmpty (obj) {
+    isEmpty(obj) {
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) return false
       }
       return true
     },
-    setLocalStoreMemberData (memberData) {
+    setLocalStoreMemberData(memberData) {
       localStorage.setItem('newMemberFormData', JSON.stringify(memberData))
     },
-    resetForm () {
+    resetForm() {
       this.$refs.newMemberForm.resetValidation()
       this.member = {}
       window.localStorage.removeItem('newMemberFormData')
     },
-    resetBdate () {
+    resetBdate() {
       this.menu1 = false
       if (this.member.bdate) {
         this.member.bdate = this.$store.getters.getMemberById(
@@ -344,19 +348,19 @@ export default {
         ).bdate
       }
     },
-    formatDate (date) {
+    formatDate(date) {
       if (!date) return null
 
       const [year, month, day] = date.split('-')
       return `${day}/${month}/${year}`
     },
-    parseDate (date) {
+    parseDate(date) {
       if (!date) return null
 
       const [month, day, year] = date.split('/')
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
     },
-    async createMember () {
+    async createMember() {
       const validation = await this.$refs.newMemberForm.validate()
 
       if (validation) {

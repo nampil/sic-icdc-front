@@ -12,7 +12,7 @@
       </v-layout>
     </div>
 
-    <v-card-text>
+    <v-card-text class="pa-0">
       <v-form
         ref="newUserForm"
         class="relative"
@@ -77,20 +77,22 @@
           single-line
         />
       </v-form>
-      <v-card-actions
-        slot="actions"
-        class="fullwidth justify-center"
-      >
-        <v-btn
-          color="info"
-          @click="resetForm"
-        >Borrar</v-btn>
-        <v-btn
-          color="success"
-          @click="registerUser"
-        >Registrar</v-btn>
-      </v-card-actions>
     </v-card-text>
+    <v-card-actions
+      slot="actions"
+      class="fullwidth justify-center ma-0"
+    >
+      <v-btn
+        color="info"
+        @click="resetForm, cancelar()"
+        small
+      >Cancelar</v-btn>
+      <v-btn
+        color="success"
+        @click="registerUser"
+        small
+      >Registrar</v-btn>
+    </v-card-actions>
   </material-card>
 </template>
 <script>

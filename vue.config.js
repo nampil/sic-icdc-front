@@ -1,17 +1,6 @@
-const SWPrecache = require('sw-precache-webpack-plugin')
+//const SWPrecache = require('sw-precache-webpack-plugin')
 
 module.exports = {
-  devServer: {
-    disableHostCheck: true,
-    proxy: {
-      '^/api': {
-        target: 'http://localhost:5000/graphql',
-        ws: true,
-        changeOrigin: true
-      }
-    }
-  },
-
   // configureWebpack: {
   //   plugins: [
   //     new SWPrecache({
@@ -26,7 +15,6 @@ module.exports = {
   //     })
   //   ]
   // },
-
   // baseUrl: '/',
   // outputDir: undefined,
   // assetsDir: undefined,
@@ -34,4 +22,16 @@ module.exports = {
   // productionSourceMap: undefined,
   // parallel: undefined,
   // css: undefined
+  devServer: {
+    disableHostCheck: true,
+    proxy: {
+      '^/api': {
+        target: 'http://localhost:5000/graphql',
+        ws: true,
+        changeOrigin: true
+      }
+    }
+  },
+
+  lintOnSave: undefined
 }

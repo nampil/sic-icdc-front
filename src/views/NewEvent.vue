@@ -1,409 +1,413 @@
 <template>
-  <v-layout>
-    <v-flex
-      xs12
-      sm10
-      offset-sm1
-    >
-      <material-card
-        color="info darken-3"
-        title="Nuevo Evento"
-        text="Registre los datos para el nuevo evento"
+  <v-container grid-list-xs>
+    <v-layout>
+      <v-flex
+        xs12
+        sm10
+        offset-sm1
       >
-        <v-form ref="newEventForm">
-          <v-container
-            py-0
-            class="relative"
-          >
-            <div
-              v-if="isloading"
-              class="loading"
+        <material-card
+          color="info darken-3"
+          title="Nuevo Evento"
+          text="Registre los datos para el nuevo evento"
+        >
+          <v-form ref="newEventForm">
+            <v-container
+              py-0
+              class="relative pa-0 ma-0"
             >
-              <v-layout
-                align-center
-                justify-center
-                row
-                fill-height
+              <div
+                v-if="isloading"
+                class="loading"
               >
-                <v-flex
-                  xs12
-                  class="text-xs-center"
+                <v-layout
+                  align-center
+                  justify-center
+                  row
+                  fill-height
                 >
-                  <v-progress-circular
-                    :size="70"
-                    :width="7"
-                    class="progress"
-                    color="purple"
-                    indeterminate
+                  <v-flex
+                    xs12
+                    class="text-xs-center"
+                  >
+                    <v-progress-circular
+                      :size="70"
+                      :width="7"
+                      class="progress"
+                      color="purple"
+                      indeterminate
+                    />
+                  </v-flex>
+                </v-layout>
+              </div>
+
+              <v-flex xs12>
+                <h3 class="section-title">Información General</h3>
+              </v-flex>
+
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="event.title"
+                    :rules="[rules.required]"
+                    class="purple-input"
+                    label="Titulo"
+                    prepend-inner-icon="mdi-calendar-week"
                   />
                 </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-select
+                    v-model="event.orgScope"
+                    :items="areaScope"
+                    hint="Organismo responsable del evento"
+                    item-text="areaScope"
+                    item-value="areaScope"
+                    label="Área de Coordinación"
+                    single-line
+                    prepend-inner-icon="mdi-clipboard-flow"
+                  />
+                  <!-- <v-text-field
+                  class="purple-input"
+                  label="Área de Coordinación"
+                  v-model="event.orgScope"
+                  :rules="[rules.required]"
+                  prepend-inner-icon="mdi-clipboard-flow"
+                  />-->
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-text-field
+                    v-model="event.cordinator"
+                    :rules="[rules.required]"
+                    class="purple-input"
+                    label="Coordinador"
+                    prepend-inner-icon="mdi-clipboard-account"
+                  />
+                </v-flex>
+
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <div
+                    :class="{'hass-error': showErrorDate}"
+                    class="label"
+                  >
+                    <v-layout
+                      row
+                      wrap
+                    >
+                      <span>
+                        <v-icon class="mr-1">mdi-calendar</v-icon>
+                      </span>
+                      <label class="labelPicker">Fecha de Inicio</label>
+                    </v-layout>
+                  </div>
+                  <v-date-picker
+                    ref="picker"
+                    :events="eventsDates"
+                    :max="maxDate"
+                    :min="new Date().toISOString().substr(0, 10)"
+                    v-model="event.eventDate"
+                    class="datePicker"
+                    locale="ES-ve"
+                    full-width
+                    @input="[showErrorDate = false]"
+                  >
+                    <v-layout>
+                      <v-flex
+                        xs12
+                        text-xs-center
+                      >
+                        <v-btn
+                          class="font-weight-light"
+                          color="error"
+                          flat
+                          @click="resetDate"
+                        >Borrar</v-btn>
+                      </v-flex>
+                    </v-layout>
+                  </v-date-picker>
+
+                  <div class="errorMessagesWrapper">
+                    <v-slide-y-transition>
+                      <div
+                        v-if="showErrorDate"
+                        class="error--text"
+                      >{{ datePickerError }}</div>
+                    </v-slide-y-transition>
+                  </div>
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <div
+                    :class="{'hass-error': showErrorTime}"
+                    class="label"
+                  >
+                    <v-layout
+                      row
+                      wrap
+                    >
+                      <span>
+                        <v-icon class="mr-1">mdi-clock</v-icon>
+                      </span>
+                      <label class="labelPicker">Hora de Inicio</label>
+                    </v-layout>
+                  </div>
+                  <v-time-picker
+                    v-model="event.eventTime"
+                    color="secondary"
+                    full-width
+                    class="timePicker"
+                    @input="showErrorTime = false"
+                  >
+                    <v-flex
+                      xs12
+                      text-xs-center
+                    >
+                      <v-btn
+                        class="font-weight-light"
+                        color="error"
+                        flat
+                        @click="resetTime"
+                      >Borrar</v-btn>
+                    </v-flex>
+                  </v-time-picker>
+                  <div class="errorMessagesWrapper">
+                    <v-slide-y-transition>
+                      <div
+                        v-if="showErrorTime"
+                        class="error--text"
+                      >{{ timePickerError }}</div>
+                    </v-slide-y-transition>
+                  </div>
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <div
+                    :class="{'hass-error': showErrorDate}"
+                    class="label"
+                  >
+                    <v-layout
+                      row
+                      wrap
+                    >
+                      <span>
+                        <v-icon class="mr-1">mdi-calendar</v-icon>
+                      </span>
+                      <label class="labelPicker">Fecha de Culminación</label>
+                    </v-layout>
+                  </div>
+                  <v-date-picker
+                    ref="pickerC"
+                    :events="eventsDates"
+                    :max="maxDate"
+                    :min="minDateC"
+                    v-model="event.eventDateC"
+                    class="datePicker"
+                    locale="ES-ve"
+                    full-width
+                    @input="showErrorDateC = false"
+                  >
+                    <v-layout>
+                      <v-flex
+                        xs12
+                        text-xs-center
+                      >
+                        <v-btn
+                          class="font-weight-light"
+                          color="error"
+                          flat
+                          @click="resetDateC"
+                        >Borrar</v-btn>
+                      </v-flex>
+                    </v-layout>
+                  </v-date-picker>
+
+                  <div class="errorMessagesWrapper">
+                    <v-slide-y-transition>
+                      <div
+                        v-if="showErrorDateC"
+                        class="error--text"
+                      >{{ datePickerErrorC }}</div>
+                    </v-slide-y-transition>
+                  </div>
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <div
+                    :class="{'hass-error': showErrorTimeC}"
+                    class="label"
+                  >
+                    <v-layout
+                      row
+                      wrap
+                    >
+                      <span>
+                        <v-icon class="mr-1">mdi-clock</v-icon>
+                      </span>
+                      <label class="labelPicker">Hora de Culminación</label>
+                    </v-layout>
+                  </div>
+                  <v-time-picker
+                    v-model="event.eventTimeC"
+                    :max="maxTimeC"
+                    :min="minTimeC"
+                    color="secondary"
+                    full-width
+                    class="timePicker"
+                    @input="showErrorTimeC = false"
+                  >
+                    <v-flex
+                      xs12
+                      text-xs-center
+                    >
+                      <v-btn
+                        class="font-weight-light"
+                        color="error"
+                        flat
+                        @click="resetTimeC"
+                      >Borrar</v-btn>
+                    </v-flex>
+                  </v-time-picker>
+                  <div class="errorMessagesWrapper">
+                    <v-slide-y-transition>
+                      <div
+                        v-if="showErrorTimeC"
+                        class="error--text"
+                      >{{ timePickerErrorC }}</div>
+                    </v-slide-y-transition>
+                  </div>
+                </v-flex>
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-text-field
+                    id="place"
+                    v-model="event.place"
+                    :rules="[placeRules.required]"
+                    name="place"
+                    label="Lugar"
+                    clearable
+                    prepend-inner-icon="mdi-map-marker"
+                  />
+                </v-flex>
+
+                <v-flex
+                  xs12
+                  md6
+                >
+                  <v-text-field
+                    id="description"
+                    v-model="event.description"
+                    name="description"
+                    label="Descripción"
+                    hint="Breve descripción del evento"
+                    prepend-inner-icon="mdi-tooltip-text"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <h3 class="section-title">Servidores</h3>
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffAuv"
+                    label="AUV"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-bookmark-music"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffProto"
+                    label="Protocolo"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-human-greeting"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffDarte"
+                    label="DicipulArte"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-guy-fawkes-mask"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffEci"
+                    label="ECI"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-teach"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffMav"
+                    label="MAV"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-speaker"
+                  />
+                </v-flex>
+                <v-flex xs12>
+                  <v-combobox
+                    v-model="event.staffVar"
+                    label="Otros Servidores"
+                    multiple
+                    small-chips
+                    prepend-inner-icon="mdi-worker"
+                  />
+                </v-flex>
+
+                <v-flex
+                  xs12
+                  text-xs-center
+                >
+                  <v-btn
+                    class="ma-2 font-weight-light"
+                    color="error"
+                    @click="resetForm"
+                    small
+                  >Cancelar</v-btn>
+
+                  <v-btn
+                    :color="enviarBtn.color"
+                    class="ma-2 font-weight-light"
+                    @click="createEvent"
+                    small
+                  >{{ enviarBtn.text }}</v-btn>
+                </v-flex>
               </v-layout>
-            </div>
-
-            <v-flex xs12>
-              <h3 class="section-title">Información General</h3>
-            </v-flex>
-
-            <v-layout wrap>
-              <v-flex xs12>
-                <v-text-field
-                  v-model="event.title"
-                  :rules="[rules.required]"
-                  class="purple-input"
-                  label="Titulo"
-                  prepend-inner-icon="mdi-calendar-week"
-                />
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-select
-                  v-model="event.orgScope"
-                  :items="areaScope"
-                  hint="Organismo responsable del evento"
-                  item-text="areaScope"
-                  item-value="areaScope"
-                  label="Área de Coordinación"
-                  single-line
-                  prepend-inner-icon="mdi-clipboard-flow"
-                />
-                <!-- <v-text-field
-                  class="purple-input"
-                  label="Área de Coordinación"
-                  v-model="event.orgScope"
-                  :rules="[rules.required]"
-                  prepend-inner-icon="mdi-clipboard-flow"
-                />-->
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-text-field
-                  v-model="event.cordinator"
-                  :rules="[rules.required]"
-                  class="purple-input"
-                  label="Coordinador"
-                  prepend-inner-icon="mdi-clipboard-account"
-                />
-              </v-flex>
-
-              <v-flex
-                xs12
-                md6
-              >
-                <div
-                  :class="{'hass-error': showErrorDate}"
-                  class="label"
-                >
-                  <v-layout
-                    row
-                    wrap
-                  >
-                    <span>
-                      <v-icon class="mr-1">mdi-calendar</v-icon>
-                    </span>
-                    <label class="labelPicker">Fecha de Inicio</label>
-                  </v-layout>
-                </div>
-                <v-date-picker
-                  ref="picker"
-                  :events="eventsDates"
-                  :max="maxDate"
-                  :min="new Date().toISOString().substr(0, 10)"
-                  v-model="event.eventDate"
-                  class="datePicker"
-                  locale="ES-ve"
-                  full-width
-                  @input="[showErrorDate = false]"
-                >
-                  <v-layout>
-                    <v-flex
-                      xs12
-                      text-xs-center
-                    >
-                      <v-btn
-                        class="font-weight-light"
-                        color="error"
-                        flat
-                        @click="resetDate"
-                      >Borrar</v-btn>
-                    </v-flex>
-                  </v-layout>
-                </v-date-picker>
-
-                <div class="errorMessagesWrapper">
-                  <v-slide-y-transition>
-                    <div
-                      v-if="showErrorDate"
-                      class="error--text"
-                    >{{ datePickerError }}</div>
-                  </v-slide-y-transition>
-                </div>
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <div
-                  :class="{'hass-error': showErrorTime}"
-                  class="label"
-                >
-                  <v-layout
-                    row
-                    wrap
-                  >
-                    <span>
-                      <v-icon class="mr-1">mdi-clock</v-icon>
-                    </span>
-                    <label class="labelPicker">Hora de Inicio</label>
-                  </v-layout>
-                </div>
-                <v-time-picker
-                  v-model="event.eventTime"
-                  color="secondary"
-                  full-width
-                  class="timePicker"
-                  @input="showErrorTime = false"
-                >
-                  <v-flex
-                    xs12
-                    text-xs-center
-                  >
-                    <v-btn
-                      class="font-weight-light"
-                      color="error"
-                      flat
-                      @click="resetTime"
-                    >Borrar</v-btn>
-                  </v-flex>
-                </v-time-picker>
-                <div class="errorMessagesWrapper">
-                  <v-slide-y-transition>
-                    <div
-                      v-if="showErrorTime"
-                      class="error--text"
-                    >{{ timePickerError }}</div>
-                  </v-slide-y-transition>
-                </div>
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <div
-                  :class="{'hass-error': showErrorDate}"
-                  class="label"
-                >
-                  <v-layout
-                    row
-                    wrap
-                  >
-                    <span>
-                      <v-icon class="mr-1">mdi-calendar</v-icon>
-                    </span>
-                    <label class="labelPicker">Fecha de Culminación</label>
-                  </v-layout>
-                </div>
-                <v-date-picker
-                  ref="pickerC"
-                  :events="eventsDates"
-                  :max="maxDate"
-                  :min="minDateC"
-                  v-model="event.eventDateC"
-                  class="datePicker"
-                  locale="ES-ve"
-                  full-width
-                  @input="showErrorDateC = false"
-                >
-                  <v-layout>
-                    <v-flex
-                      xs12
-                      text-xs-center
-                    >
-                      <v-btn
-                        class="font-weight-light"
-                        color="error"
-                        flat
-                        @click="resetDateC"
-                      >Borrar</v-btn>
-                    </v-flex>
-                  </v-layout>
-                </v-date-picker>
-
-                <div class="errorMessagesWrapper">
-                  <v-slide-y-transition>
-                    <div
-                      v-if="showErrorDateC"
-                      class="error--text"
-                    >{{ datePickerErrorC }}</div>
-                  </v-slide-y-transition>
-                </div>
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <div
-                  :class="{'hass-error': showErrorTimeC}"
-                  class="label"
-                >
-                  <v-layout
-                    row
-                    wrap
-                  >
-                    <span>
-                      <v-icon class="mr-1">mdi-clock</v-icon>
-                    </span>
-                    <label class="labelPicker">Hora de Culminación</label>
-                  </v-layout>
-                </div>
-                <v-time-picker
-                  v-model="event.eventTimeC"
-                  :max="maxTimeC"
-                  :min="minTimeC"
-                  color="secondary"
-                  full-width
-                  class="timePicker"
-                  @input="showErrorTimeC = false"
-                >
-                  <v-flex
-                    xs12
-                    text-xs-center
-                  >
-                    <v-btn
-                      class="font-weight-light"
-                      color="error"
-                      flat
-                      @click="resetTimeC"
-                    >Borrar</v-btn>
-                  </v-flex>
-                </v-time-picker>
-                <div class="errorMessagesWrapper">
-                  <v-slide-y-transition>
-                    <div
-                      v-if="showErrorTimeC"
-                      class="error--text"
-                    >{{ timePickerErrorC }}</div>
-                  </v-slide-y-transition>
-                </div>
-              </v-flex>
-              <v-flex
-                xs12
-                md6
-              >
-                <v-text-field
-                  id="place"
-                  v-model="event.place"
-                  :rules="[placeRules.required]"
-                  name="place"
-                  label="Lugar"
-                  clearable
-                  prepend-inner-icon="mdi-map-marker"
-                />
-              </v-flex>
-
-              <v-flex
-                xs12
-                md6
-              >
-                <v-text-field
-                  id="description"
-                  v-model="event.description"
-                  name="description"
-                  label="Descripción"
-                  hint="Breve descripción del evento"
-                  prepend-inner-icon="mdi-tooltip-text"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <h3 class="section-title">Servidores</h3>
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffAuv"
-                  label="AUV"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-bookmark-music"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffProto"
-                  label="Protocolo"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-human-greeting"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffDarte"
-                  label="DicipulArte"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-guy-fawkes-mask"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffEci"
-                  label="ECI"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-teach"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffMav"
-                  label="MAV"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-speaker"
-                />
-              </v-flex>
-              <v-flex xs12>
-                <v-combobox
-                  v-model="event.staffVar"
-                  label="Otros Servidores"
-                  multiple
-                  small-chips
-                  prepend-inner-icon="mdi-worker"
-                />
-              </v-flex>
-
-              <v-flex
-                xs12
-                text-xs-right
-              >
-                <v-btn
-                  class="mx-4 font-weight-light"
-                  color="error"
-                  @click="resetForm"
-                >Cancelar</v-btn>
-
-                <v-btn
-                  :color="enviarBtn.color"
-                  class="mx-0 font-weight-light"
-                  @click="createEvent"
-                >{{ enviarBtn.text }}</v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
-      </material-card>
-    </v-flex>
-  </v-layout>
+            </v-container>
+          </v-form>
+        </material-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 export default {
   name: 'NewEvent',
-  data () {
+  data() {
     return {
       menuEndTime: null,
       showErrorDate: false,
@@ -425,12 +429,12 @@ export default {
     }
   },
   computed: {
-    areaScope () {
+    areaScope() {
       return this.$store.getters.getAreaScope.map(area => {
         return area.title
       })
     },
-    maxTimeC () {
+    maxTimeC() {
       if (this.minTimeC) {
         return '24:30'
       } else {
@@ -438,7 +442,7 @@ export default {
       }
     },
 
-    minTimeC () {
+    minTimeC() {
       if (this.event.eventDateC && this.event.eventDate) {
         const [yearC, monthC, dayC] = this.event.eventDateC.split('-')
         const [year, month, day] = this.event.eventDate.split('-')
@@ -450,12 +454,12 @@ export default {
         return undefined
       }
     },
-    minDateC () {
+    minDateC() {
       return this.event.eventDate
         ? this.event.eventDate
         : new Date().toISOString().substr(0, 10)
     },
-    enviarBtn () {
+    enviarBtn() {
       if (this.showErrorDate || this.showErrorTime) {
         return {
           text: 'Datos invalidos',
@@ -469,18 +473,18 @@ export default {
       }
     },
     endTimeFormatted: {
-      get: function () {
+      get: function() {
         return this.formatEndTime(this.event.endTime)
       },
-      set: function (val) {
+      set: function(val) {
         this.event.endTime = val
       }
     },
 
-    computedDateFormatted () {
+    computedDateFormatted() {
       return this.formatDate(this.event.eventDate)
     },
-    maxDate () {
+    maxDate() {
       const nowDate = new Date()
       const nowYear = nowDate.getFullYear()
       const nowMonth = nowDate.getMonth()
@@ -489,20 +493,20 @@ export default {
       return new Date(nowYear + 1, nowMonth, nowDay).toISOString().substr(0, 10)
     },
     isloading: {
-      get: function () {
+      get: function() {
         return this.$store.getters.getIsloading
       },
-      set: function (payload) {
+      set: function(payload) {
         this.$store.dispatch('setLoading', payload)
       }
     }
   },
   watch: {
-    'event.eventDate' (val) {
+    'event.eventDate'(val) {
       this.resetDateC()
     },
     event: {
-      handler: function (newval) {
+      handler: function(newval) {
         if (!this.isEmpty(newval)) {
           this.setLocalStoreEventData(this.event)
         }
@@ -511,16 +515,16 @@ export default {
     }
   },
   methods: {
-    isEmpty (obj) {
+    isEmpty(obj) {
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) return false
       }
       return true
     },
-    setLocalStoreEventData (eventData) {
+    setLocalStoreEventData(eventData) {
       localStorage.setItem('newEventFormData', JSON.stringify(eventData))
     },
-    formatEndTime (endTime) {
+    formatEndTime(endTime) {
       if (!endTime) return null
       const hour = endTime.split(':')[0]
       const min = endTime.split(':')[1]
@@ -531,17 +535,17 @@ export default {
         return hour + ':' + min + ' am'
       }
     },
-    formatDate (date) {
+    formatDate(date) {
       if (!date) return null
 
       const [year, month, day] = date.split('-')
       return `${day}/${month}/${year}`
     },
 
-    resetValidation () {
+    resetValidation() {
       this.$refs.newEventForm.resetValidation()
     },
-    resetForm () {
+    resetForm() {
       this.datePickerError = ''
       this.showErrorDate = false
       this.showErrorTime = false
@@ -549,22 +553,22 @@ export default {
       this.event = {}
       window.localStorage.removeItem('newEventFormData')
     },
-    resetDate () {
+    resetDate() {
       this.event.eventDate = ''
       this.resetDateC()
       this.resetTimeC()
     },
-    resetDateC () {
+    resetDateC() {
       if (this.event.eventDateC) this.event.eventDateC = ''
     },
-    resetTimeC () {
+    resetTimeC() {
       if (this.event.eventTimeC) this.event.eventTimeC = ''
     },
-    resetTime () {
+    resetTime() {
       this.resetTimeC()
       this.event.eventTime = ''
     },
-    async createEvent () {
+    async createEvent() {
       // Validate the form
       const validation = await this.$refs.newEventForm.validate()
       // Custom validation
@@ -676,7 +680,7 @@ export default {
           })
       }
     },
-    created () {
+    created() {
       const newEventFormData = window.localStorage.getItem('newEventFormData')
       if (newEventFormData) {
         this.event = JSON.parse(newEventFormData)
